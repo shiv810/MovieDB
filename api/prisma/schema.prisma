@@ -14,8 +14,61 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  auth0Id      String   @unique @default("")
-  name         String?
+  id            String    @id @default(uuid())
+  fullName      String?
+  avatarUrl     String?
+  auth0Id       String    @unique @default("")
+  updatedAt     DateTime?
+  paymentMethod Json?
+  email         String    @unique
+}
+
+model Workspace {
+  id             String         @id @default(uuid())
+  createdAt      DateTime       @default(now())
+  workspaceOwner String
+  title          String
+  iconId         String
+  data           String?
+  inTrash        String?
+  logo           String?
+  bannerUrl      String?
+  folders        Folder[]
+  File           File[]
+  Collaborator   Collaborator[]
+}
+
+model Folder {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  title       String
+  iconId      String
+  data        String?
+  inTrash     String?
+  bannerUrl   String?
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  files       File[]
+}
+
+model File {
+  id          String    @id @default(uuid())
+  createdAt   DateTime  @default(now())
+  title       String
+  iconId      String
+  data        String?
+  inTrash     String?
+  bannerUrl   String?
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId String
+  folder      Folder    @relation(fields: [folderId], references: [id])
+  folderId    String
+}
+
+model Collaborator {
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  createdAt   DateTime  @default(now())
+  userId      String    @id @default(uuid())
+  id          String    @default(uuid())
+  workspaceId String
 }
