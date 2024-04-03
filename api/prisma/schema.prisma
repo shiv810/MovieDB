@@ -14,8 +14,37 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
-  email        String   @unique
-  auth0Id      String   @unique @default("")
-  name         String?
+  id              Int              @id @default(autoincrement())
+  email           String           @unique
+  auth0Id         String           @unique @default("")
+  name            String?
+  reviews         Review[]
+  recommendations Recommendation[]
+  WatchListItem   WatchListItem[]
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  movieId   Int
+  auth0Id   String
+  review    String   @default("")
+  stars     Int      @default(0)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [auth0Id], references: [auth0Id])
+}
+
+model Recommendation {
+  id               Int    @id @default(autoincrement())
+  auth0Id          String
+  movieIdParent    Int
+  movieIdRecommend Int
+  comment          String @default("")
+  user             User   @relation(fields: [auth0Id], references: [auth0Id])
+}
+
+model WatchListItem {
+  id       Int    @id @default(autoincrement())
+  auth0Id  String
+  movieId Int
+  user     User   @relation(fields: [auth0Id], references: [auth0Id])
 }
