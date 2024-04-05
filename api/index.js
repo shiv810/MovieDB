@@ -56,6 +56,39 @@ app.post("/verify-user", requireAuth, async (req, res) => {
 
 // add your endpoints below this line
 
+// Users
+
+//GET: /users/:auth0Id - Get a user by their auth0Id (requires authentication)
+app.get("/users/:auth0Id", requireAuth, async (req, res) => {
+  const { auth0Id } = req.params;
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+  res.json(user);
+});
+
+//PUT: /users/:auth0Id - Update a user by their auth0Id (requires authentication)
+app.put("/users/:auth0Id", requireAuth, async (req, res) => {
+  const { auth0Id } = req.params;
+  const { name, email } = req.body;
+
+  const user = await prisma.user.update({
+    where: {
+      auth0Id,
+    },
+    data: {
+      name,
+      email,
+    },
+  });
+
+  res.json(user);
+});
+
+
+// Review
 
 //GET: /reviews/:movieId - Get all reviews for a movie
 app.get("/reviews/:movieId", async (req, res) => {
@@ -102,6 +135,50 @@ app.post("/reviews", requireAuth, async (req, res) => {
   res.json(review);
 });
 
+//GET: /reviews/:auth0Id - Get all reviews made by a user
+app.get("/user/reviews/:auth0Id", requireAuth, async (req, res) => {
+  const { auth0Id } = req.params;
+  const reviews = await prisma.review.findMany({
+    where: {
+      auth0Id,
+    },
+  });
+  res.json(reviews);
+});
+
+// PUT: /reviews/:reviewId - Update a review (requires authentication)
+app.put("/reviews/:reviewId", requireAuth, async (req, res) => {
+  const { reviewId } = req.params;
+  const { text, stars } = req.body;
+
+  const review = await prisma.review.update({
+    where: {
+      id: parseInt(reviewId),
+    },
+    data: {
+      review: text,
+      stars,
+    },
+  });
+
+  res.json(review);
+});
+
+// DELETE: /reviews/:reviewId - Delete a review (requires authentication)
+app.delete("/reviews/:reviewId", requireAuth, async (req, res) => {
+  const { reviewId } = req.params;
+
+  const review = await prisma.review.delete({
+    where: {
+      id: parseInt(reviewId),
+    },
+  });
+
+  res.json(review);
+});
+
+
+// Recommendations
 
 //GET: /recommendations/:movieId - Get all recommendations for a movie
 app.get("/recommendations/:movieId", async (req, res) => {
@@ -141,6 +218,31 @@ app.post("/recommendations", requireAuth, async (req, res) => {
       movieIdParent,
       movieIdRecommend,
       auth0Id: req.auth.payload.sub,
+    },
+  });
+
+  res.json(recommendation);
+});
+
+//GET: /recommendations/:auth0Id - Get all recommendations made by a user
+app.get("/user/recommendations/:auth0Id", requireAuth, async (req, res) => {
+  const { auth0Id } = req.params;
+  const recommendations = await prisma.recommendation.findMany({
+    where: {
+      auth0Id,
+    },
+  });
+
+  res.json(recommendations);
+});
+
+// DELETE: /recommendations/:recommendationId - Delete a recommendation (requires authentication)
+app.delete("/recommendations/:recommendationId", requireAuth, async (req, res) => {
+  const { recommendationId } = req.params;
+
+  const recommendation = await prisma.recommendation.delete({
+    where: {
+      id: parseInt(recommendationId),
     },
   });
 

@@ -4,11 +4,15 @@ import { Spinner } from "flowbite-react";
 import ReviewModal from '../ReviewModal/ReviewModal';
 import RecommendationsTab from '../RecommendationTab/RecommendationTab';
 import { useAuthToken } from '../../AuthTokenContext';
+import ReviewCard from './ReviewCard';
+import { Tabs } from "flowbite-react";
+import { useAuth0 } from '@auth0/auth0-react';
 
 const MovieDetails = ({ movieId }) => {
 
   const [movieJSON, setMovieDetails] = useState(null);
   const { accessToken } = useAuthToken();
+  const {isLoading} = useAuth0();
   const [isReviewTabOpen, setIsReviewTabOpen] = useState(true);
   const [isRecommendationTabOpen, setIsRecommendationTabOpen] = useState(false);
   const [recommendations, setRecommendations] = useState([]);
@@ -32,6 +36,7 @@ const MovieDetails = ({ movieId }) => {
   };
 
   const fetchWatchlist = async () => {
+    console.log("fetching watchlist")
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/watchlist`, {
         method: 'GET',
@@ -61,15 +66,6 @@ const MovieDetails = ({ movieId }) => {
     }
   }
 
-  const handleReviewTabClick = () => {
-    setIsReviewTabOpen(true);
-    setIsRecommendationTabOpen(false);
-  }
-
-  const handleRecommendationTabClick = () => {
-    setIsReviewTabOpen(false);
-    setIsRecommendationTabOpen(true);
-  }
 
   const handleAddReview = async (reviewData) => {
     try {
@@ -105,6 +101,10 @@ const MovieDetails = ({ movieId }) => {
   }
 
   const onClickAddToWatchlist = async () => {
+    if (!accessToken) {
+      alert('You must be logged in to add a movie to the watchlist');
+      return;
+    }
     setIsMutatingWatchlist(true);
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/watchlist`, {
@@ -148,6 +148,14 @@ const MovieDetails = ({ movieId }) => {
     setIsMutatingWatchlist(false);
   }
 
+  const handleAddReviewButtonClick = () => {
+    if (!accessToken) {
+      alert('You must be logged in to add a movie to the watchlist');
+      return;
+    }
+    setIsOpened(true);
+  }
+
   useEffect(() => {
     const fetchMovieDetails = async () => {
       const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=034e14c6f2ab0e0ccfeea2a32339ffe3`);
@@ -157,7 +165,6 @@ const MovieDetails = ({ movieId }) => {
     fetchMovieDetails();
     fetchReviews();
     fetchRecommendations();
-    fetchWatchlist();
    
     if (window.location.href.includes('recommended')) {
       setIsReviewTabOpen(false);
@@ -169,13 +176,19 @@ const MovieDetails = ({ movieId }) => {
   }, [movieId]);
 
   useEffect(() => {
+    if(accessToken) {
+      fetchWatchlist();
+    }
+  }, [accessToken]);
+
+  useEffect(() => {
     if (watchlist.length > 0) {
       setMovieDetails(prevMovie => ({ ...prevMovie, isWatchlisted: watchlist.some(item => item.movieId === parseInt(movieId)) }));
     }
-  }, [watchlist])
+  }, [watchlist]);
 
 
-  if (movieJSON === null) {
+  if (movieJSON === null || movieJSON.original_title === undefined || isLoading) {
     return <div>Loading...</div>;
   }
 
@@ -204,7 +217,7 @@ const MovieDetails = ({ movieId }) => {
                   <svg className='absolute top-0 left-0' width='100%' height='100%' viewBox='0 0 100 100' fill="#081c22" xmlns='http://www.w3.org/2000/svg'>
                     <circle cx='50' cy='50' r='48' stroke='#081c22' strokeWidth='4' />
                     <circle cx='50' cy='50' r='48' stroke='#21d07a' strokeWidth='4' strokeDasharray={`${(movieJSON.vote_average * 10) * 3.14} 301.592`} strokeLinecap='round' />
-                  </svg>e
+                  </svg>
                   <div className='absolute top-0 left-0 flex items-center justify-center w-14 h-14'>
                     <span className='text-sm text-white'>{Math.round(movieJSON.vote_average * 10)}%</span>
                   </div>
@@ -214,7 +227,7 @@ const MovieDetails = ({ movieId }) => {
                 </div>
               </div>
               <div className='flex flex-row mt-5 flex-wrap'>
-                {movieJSON.isWatchlisted ? (
+                {movieJSON.isWatchlisted === true ? (
                 <button
                   className='mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-52'
                   onClick={HandleWatchlistRemove}
@@ -243,52 +256,32 @@ const MovieDetails = ({ movieId }) => {
           </div>
         </div>
       </div>
-      <div className='p-4 lg:px-40 md:px-20 flex flex-wrap lg:flex-normal'>
-        <div className='flex flex-col lg:w-[90%] w-full'>
-          <div className='flex flex-row lg:gap-x-10 flex-wrap'>
-            <p className='text-4xl font-bold'>Socials</p>
-            <div className="flex flex-row items-center space-x-10">
-              <button className={`text-lg font-semibold px-4 py-2 focus:outline-none ${isReviewTabOpen ? 'border-b-4 border-blue-500' : ''}`} onClick={handleReviewTabClick}>Reviews</button>
-              <button className={`text-lg font-semibold px-4 py-2 focus:outline-none ${isRecommendationTabOpen ? 'border-b-4 border-blue-500' : ''}`} onClick={handleRecommendationTabClick}>Recommendations</button>
-            </div>
-          </div>
-          {isReviewTabOpen && (
-            <div>
-              {reviews.length === 0 && <p className='text-2xl font-semibold pt-5'>No reviews yet</p>}
-              {reviews.map((review, index) => (
-                <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full lg:w-4/5" key={index}>
-                  <div className="flex items-center p-4">
-                    <div className="mr-4">
-                      <a href="#">
-                        <span className="rounded-full bg-orange-500 text-white w-10 h-10 flex items-center justify-center">{review.user[0]}</span>
-                      </a>
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold">A review by {review.user}</h3>
-                      <div className="flex items-center">
-                        <div className="rounded-full bg-gray-200 px-3 py-1 text-sm font-semibold flex flex-row items-center gap-x-1"><StarIcon className="h-3 w-3 leading-5 text-white-500" />{review.stars}</div>
-                        <h5 className="ml-2">Written by <a href="#">{review.user}</a> on {new Date(review.time).toLocaleDateString('us')}</h5>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="px-4 pb-4">
-                    <p className="text-gray-700">{review.content}</p>
-                  </div>
+      <div className='p-4 justify-between lg:px-40 md:px-20 flex flex-wrap lg:flex-normal'>
+        <div className='w-full lg:w-4/5 md:w-4/5'>
+          <p className='text-4xl font-bold pb-5'>Socials</p>
+          <Tabs aria-label="Tabs with underline" style="pills" className='w-full'>
+            <Tabs.Item active={isReviewTabOpen}  title={<span className='text-2xl font-bold'>Reviews</span>} className='w-full'>
+            <div className='pt-5'>
+                <div className='flex flex-col gap-10'>
+                {reviews.length === 0 && <p className='text-xl font-semibold pt-5'>No reviews yet</p>}
+                {reviews.map((review, index) => (
+                  <ReviewCard user={review.user} stars={review.stars} time={review.time} content={review.content} movieId={movieId} id={review.id} key={index}/>
+                ))}
                 </div>
-              ))}
-              <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5' onClick={() => setIsOpened(true)}>Add Review</button>
-              <ReviewModal
-                isOpen={isOpened}
-                onClose={() => setIsOpened(false)}
-                onAddReview={(reviewData) => handleAddReview(reviewData)}
-              />
-            </div>
-          )}
-          {isRecommendationTabOpen && (
-            <div>
-              <RecommendationsTab recommendations={recommendations} movieId={movieJSON.id} recommendedURL={window.location.href} handleAddRecommendation={handleAddRecommendation} />
-            </div>
-          )}
+                <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5' onClick={() => handleAddReviewButtonClick()}>Add Review</button>
+                <ReviewModal
+                  isOpen={isOpened}
+                  onClose={() => setIsOpened(false)}
+                  onAddReview={(reviewData) => handleAddReview(reviewData)}
+                />
+              </div>
+            </Tabs.Item>
+            <Tabs.Item active={isRecommendationTabOpen} title={<span className='text-xl font-bold'>Recommendations</span>} className='w-full'>
+            <div className='pt-5'>
+                <RecommendationsTab recommendations={recommendations} movieId={movieJSON.id} recommendedURL={window.location.href} handleAddRecommendation={handleAddRecommendation} />
+              </div>
+            </Tabs.Item>
+          </Tabs>
         </div>
 
         <div className='flex flex-col' id="facts">

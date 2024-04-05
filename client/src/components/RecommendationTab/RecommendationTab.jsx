@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuthToken } from '../../AuthTokenContext';
+import RecommendationCard from './RecommendationCard';
 
 function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAddRecommendation }) {
-    const [movies, setMovies] = useState([]);
+    const { accessToken } = useAuthToken();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const movieIdParent = movieId ? movieId : 0;
@@ -11,13 +13,6 @@ function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAd
 
     useEffect(() => {
         const fetchMovies = async () => {
-            const promises = recommendations.map((recommendation) => {
-                return fetch(`https://api.themoviedb.org/3/movie/${recommendation.movieIdRecommend}?api_key=034e14c6f2ab0e0ccfeea2a32339ffe3`)
-                    .then((response) => response.json());
-            });
-
-            const fetchedMovies = await Promise.all(promises);
-            setMovies(fetchedMovies);
             setLoading(false);
             if (recommendedURL) {
                 if (recommendedURL.includes('recommended')) {
@@ -27,7 +22,6 @@ function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAd
             }
 
         };
-
         fetchMovies();
     }, [recommendations]);
 
@@ -49,6 +43,14 @@ function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAd
     const handleCancel = () => {
         navigate(`/movies/${movieIdParent}`);
         setRecommendMovieID(0);
+    }
+
+    const handleAddRecommendationButtonClick = () => {
+        if (!accessToken) {
+            alert('You must be logged in to add a movie to the watchlist');
+            return;
+        }
+        navigate(`/recommendations/${movieIdParent}`)
     }
 
     if (recommendMovieID !== 0) {
@@ -89,31 +91,22 @@ function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAd
 
     return (
         <>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-10">
                 {loading ? (
                     <p>Loading...</p>
-                ) : movies.length === 0 ? (
+                ) : recommendations.length === 0 ? (
                     <>
                         <div className='flex flex-col'>
                             <p className="text-2xl font-semibold pt-5">No recommendations yet</p>
                         </div>
                     </>
                 ) : (
-                    movies.map((movie, index) => (
-                        <div className="w-full sm:w-1/2 lg:w-1/3 pt-5" key={index}>
-                            <div className="bg-white shadow-lg rounded-lg overflow-hidden h-full flex flex-col">
-                                <img src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt={movie.title} className="w-full h-56 object-cover" />
-                                <div className="p-4">
-                                    <h3 className="text-lg font-semibold mb-2">{movie.title}</h3>
-                                    <p className="text-gray-700 mb-2">Recommended by {recommendations[index].user}</p>
-                                    <p className="text-gray-700">{recommendations[index].comment}</p>
-                                </div>
-                            </div>
-                        </div>
+                    recommendations.map((recommendation, index) => (
+                        <RecommendationCard key={index} movie_id={recommendation.movieIdRecommend} recommendation={recommendations[index]}/>
                     ))
                 )}
             </div>
-            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5" onClick={() => navigate(`/recommendations/${movieIdParent}`)}> Recommend a movie</button>
+            <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5" onClick={() => {handleAddRecommendationButtonClick()}}> Recommend a movie</button>
         </>
     );
 }

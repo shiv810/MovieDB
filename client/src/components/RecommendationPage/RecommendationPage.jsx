@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import SearchPage from '../SearchBar/SearchPage'
+import SearchComponent from '../SearchBar/SearchComponent'
 import { useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import NavBar from '../MainNavBar/NavBar'
@@ -10,6 +10,7 @@ const RecommendationPage = () => {
     const navigate = useNavigate();
     const { user } = useAuth0();
     const { movieId } = useParams();
+    const [excludeMovieIds, setExcludeMovieIds] = useState([]);
     const [movie, setMovie] = useState(null);
 
     const onClick = (movie) => {
@@ -17,6 +18,24 @@ const RecommendationPage = () => {
             navigate(`/movies/${movieId}?recommended=${movie.id}`);
         }
     }
+
+    const fetchRecommendations = async () => {
+        try {
+          const response = await fetch(`${process.env.REACT_APP_API_URL}/recommendations/${movieId}`, {
+            headers: {
+              'Cache-Control': 'no-cache', // Prevent caching
+            },
+          });
+          const data = await response.json();   
+          setExcludeMovieIds([parseInt(movieId), ...data.map((movie) => movie.movieIdRecommend)]);
+        } catch (error) {
+          alert('Error fetching recommendations: ' + error);
+        }
+      }
+
+    useEffect(() => {
+        fetchRecommendations(); 
+    }, [])
 
     useEffect(() => {
         const fetchMovieDetails = async () => {
@@ -42,7 +61,7 @@ const RecommendationPage = () => {
                 <img src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`} alt="movie poster" className="max-h-20 ml-4 rounded-lg shadow-md" />
                 <p className="ml-4 text-gray-800 font-bold">{movie.title}</p>
             </div>
-            <SearchPage onClick={onClick} />
+            <SearchComponent onClick={onClick} excludeMovieIds={excludeMovieIds}/>
         </div>
     )
 }

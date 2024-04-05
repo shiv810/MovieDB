@@ -11,6 +11,7 @@ import './styles.css';
 import MoviePage from "./components/MoviePage";
 import Profile from "./components/Profile";
 import AuthDebugger from "./components/AuthDebugger";
+import SearchPage from "./components/SearchBar/SearchPage";
 
 const container = document.getElementById("root");
 const root = ReactDOMClient.createRoot(container);
@@ -38,6 +39,8 @@ root.render(
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/authDebugger" element={<AuthDebugger />} />
+            <Route path="/search" element={<SearchPage/>} />
+            <Route path="/search/:query" element={<SearchPage/>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

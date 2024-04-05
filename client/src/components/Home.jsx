@@ -2,11 +2,17 @@ import React, { useState, useEffect } from 'react';
 import NavBar from './MainNavBar/NavBar';
 import { useAuth0 } from '@auth0/auth0-react';
 import { Carousel } from "flowbite-react";
+import { useAuthToken } from '../AuthTokenContext';
+import MovieCard from './Utils/MovieCard';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [movies, setMovies] = useState([]);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const { user, isAuthenticated } = useAuth0();
+  const [watchlist, setWatchlist] = useState([]);
+  const { accessToken } = useAuthToken();
+  const { user, isAuthenticated, isLoading } = useAuth0();
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -28,7 +34,36 @@ const Home = () => {
     fetchMovies();
   }, []);
 
-  if (loading || !user) {
+  useEffect(() => {
+    if (!accessToken) return;
+
+    const fetchWatchlistAndMovieDetails = async () => {
+      try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/watchlist`, {
+          method: 'GET',
+          headers: {
+            'Cache-Control': 'no-cache',
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        const watchlist = await response.json();
+
+        const updatedWatchlist = await Promise.all(watchlist.map(async (item) => {
+          const response = await fetch(`https://api.themoviedb.org/3/movie/${item.movieId}?api_key=034e14c6f2ab0e0ccfeea2a32339ffe3`);
+          const data = await response.json();
+          return { ...item, ...data };
+        }));
+
+        setWatchlist(updatedWatchlist);
+      } catch (error) {
+        alert('Error fetching watchlist: ' + error);
+      }
+    };
+
+    fetchWatchlistAndMovieDetails();
+  }, [accessToken]);
+
+  if (loading || isLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
@@ -37,7 +72,7 @@ const Home = () => {
   }
 
   return (
-    <div className='home'>
+    <div className='home text-center'>
       <NavBar user={user} />
       <div className="bg-gray-900 text-white">
         {isAuthenticated ? (
@@ -75,31 +110,27 @@ const Home = () => {
           </div>
         )}
       </div>
-      <div className="container lg:px-40 mt-8 p-4 mx-auto">
-        <h2 className="text-2xl font-semibold mb-4">Popular Movies</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mx-auto">
-          {movies.map(movie => (
-            <div key={movie.id} className="bg-gray-800 rounded-lg overflow-hidden h-full min-h-400px">
-              <img
-                src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                alt={movie.title}
-                className="w-full h-64 object-cover"
-              />
-              <div className="p-4">
-                <h3 className="text-lg font-semibold mb-2 min-h-16">{movie.title}</h3>
-                <div className='min-h-30'>
-                  <p className="text-gray-400">
-                    Release Date: {movie.release_date}
-                  </p>
-                  <p className="text-gray-400">
-                    Rating: {movie.vote_average}/10
-                  </p>
-                </div>
-                <button onClick={() => window.location.href = `/movies/${movie.id}`} className="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
-                  View Details
-                </button>
+      <div className="p-4 lg:px-40 md:px-20">
+        {isAuthenticated && (
+          <div>
+            <h2 className="text-2xl font-semibold mb-4">Your Watchlist</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mx-auto">
+              {
+                watchlist.map(item => (
+                  <MovieCard key={item.id} {...item} />
+                ))
+              }
+              <div className="bg-gray-400 rounded-lg overflow-hidden h-full min-h-96 flex items-center justify-center cursor-pointer" onClick={() => navigate(`/search`)}>
+                <div className="text-4xl text-white">+</div>
               </div>
             </div>
+
+          </div>
+        )}
+        <h2 className="text-2xl font-semibold mb-4">Popular Movies</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mx-auto">
+          {movies.map(movie => (
+            <MovieCard key={movie.id} {...movie} />
           ))}
         </div>
       </div>

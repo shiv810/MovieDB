@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { StarIcon } from '@heroicons/react/24/solid'
 
-function ReviewModal({ isOpen, onClose, onAddReview }) {
-    const [newReview, setNewReview] = useState('');
-    const [stars, setStars] = useState(0);
+function ReviewModal({ isOpen, onClose, onAddReview, defaultValueText, defaultValueStars}) {
+    const [newReview, setNewReview] = useState(defaultValueText || '');
+    const [stars, setStars] = useState(defaultValueStars || 0);
 
     const handleAddReview = () => {
         onAddReview({ text: newReview, stars });
@@ -11,6 +11,11 @@ function ReviewModal({ isOpen, onClose, onAddReview }) {
         setStars(0);
         onClose();
     };
+
+    useEffect(() => {
+        setNewReview(defaultValueText);
+        setStars(defaultValueStars);
+    }, [defaultValueStars, defaultValueText]);
 
     if (!isOpen) {
         return null;
@@ -32,7 +37,7 @@ function ReviewModal({ isOpen, onClose, onAddReview }) {
                         <textarea
                             value={newReview}
                             onChange={(e) => setNewReview(e.target.value)}
-                            placeholder='Write your review here...'
+                            placeholder={newReview === '' ? 'Write your review here...' : newReview}
                             className='w-full h-20 p-2 border border-gray-300 rounded'
                         />
                         <div className='flex flex-row mt-2'>
