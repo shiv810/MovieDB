@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { StarIcon } from '@heroicons/react/24/solid'
 import { Spinner } from "flowbite-react";
 import ReviewModal from '../ReviewModal/ReviewModal';
 import RecommendationsTab from '../RecommendationTab/RecommendationTab';
 import { useAuthToken } from '../../AuthTokenContext';
 import ReviewCard from './ReviewCard';
 import { Tabs } from "flowbite-react";
+import { fetchReviews, fetchRecommendations, fetchWatchlist, fetchMovieDetails } from '../Utils/utils';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const MovieDetails = ({ movieId }) => {
 
   const [movieJSON, setMovieDetails] = useState(null);
-  const { accessToken } = useAuthToken();
+  const { accessToken } = useAuthToken() || {};
   const {isLoading} = useAuth0();
   const [isReviewTabOpen, setIsReviewTabOpen] = useState(true);
   const [isRecommendationTabOpen, setIsRecommendationTabOpen] = useState(false);
@@ -20,51 +20,6 @@ const MovieDetails = ({ movieId }) => {
   const [isMutatingWatchlist, setIsMutatingWatchlist] = useState(false);
   const [reviews, setReviews] = useState([]);
   const [isOpened, setIsOpened] = useState(false);
-
-  const fetchReviews = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/reviews/${movieId}`, {
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      });
-      const data = await response.json();
-      setReviews(prevReviews => data);
-    } catch (error) {
-      alert('Error fetching reviews: ' + error);
-    }
-  };
-
-  const fetchWatchlist = async () => {
-    console.log("fetching watchlist")
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/watchlist`, {
-        method: 'GET',
-        headers: {
-          'Cache-Control': 'no-cache',
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-      const data = await response.json();
-      setWatchlist(data);
-    } catch (error) {
-      alert('Error fetching watchlist: ' + error);
-    }
-  }
-
-  const fetchRecommendations = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/recommendations/${movieId}`, {
-        headers: {
-          'Cache-Control': 'no-cache', // Prevent caching
-        },
-      });
-      const data = await response.json();
-      setRecommendations(data);
-    } catch (error) {
-      alert('Error fetching recommendations: ' + error);
-    }
-  }
 
 
   const handleAddReview = async (reviewData) => {
@@ -94,7 +49,7 @@ const MovieDetails = ({ movieId }) => {
         },
         body: JSON.stringify({ ...recommendationData, movieIdRecommend: parseInt(recommendationData.movieId), movieIdParent: parseInt(movieId) }),
       });
-      fetchRecommendations();
+      fetchRecommendations(movieId, setRecommendations);
     } catch (error) {
       alert('Error adding recommendation');
     }
@@ -157,14 +112,9 @@ const MovieDetails = ({ movieId }) => {
   }
 
   useEffect(() => {
-    const fetchMovieDetails = async () => {
-      const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=034e14c6f2ab0e0ccfeea2a32339ffe3`);
-      const data = await response.json();
-      setMovieDetails(data);
-    };
-    fetchMovieDetails();
-    fetchReviews();
-    fetchRecommendations();
+    fetchMovieDetails(movieId, setMovieDetails);
+    fetchReviews(movieId, setReviews);
+    fetchRecommendations(movieId, setRecommendations);
    
     if (window.location.href.includes('recommended')) {
       setIsReviewTabOpen(false);
@@ -177,7 +127,7 @@ const MovieDetails = ({ movieId }) => {
 
   useEffect(() => {
     if(accessToken) {
-      fetchWatchlist();
+      fetchWatchlist(accessToken, setWatchlist);
     }
   }, [accessToken]);
 
@@ -185,7 +135,7 @@ const MovieDetails = ({ movieId }) => {
     if (watchlist.length > 0) {
       setMovieDetails(prevMovie => ({ ...prevMovie, isWatchlisted: watchlist.some(item => item.movieId === parseInt(movieId)) }));
     }
-  }, [watchlist]);
+  }, [watchlist, movieId]);
 
 
   if (movieJSON === null || movieJSON.original_title === undefined || isLoading) {

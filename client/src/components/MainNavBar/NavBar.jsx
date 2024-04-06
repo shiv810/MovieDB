@@ -97,8 +97,7 @@ const NavBar = ({ user }) => {
                         )}
                         {!isAuthenticated && (
                             <>
-                                <a href="/profile" className="text-white text-center h-full">Profile</a>
-                                <button onClick={() => loginWithRedirect()()} className="bg-blue-500 text-white font-semibold py-2 px-4 rounded mx-auto hover:border-indigo-500 hover:bg-transparent h-full">Log In</button>
+                                <button onClick={() => loginWithRedirect()} className="bg-blue-500 text-white font-semibold py-2 px-4 rounded mx-auto hover:border-indigo-500 hover:bg-transparent h-full">Log In</button>
                             </>
 
                         )}

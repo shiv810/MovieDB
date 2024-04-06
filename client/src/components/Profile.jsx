@@ -5,10 +5,12 @@ import React, { useEffect, useState } from 'react';
 import { useAuthToken } from "../AuthTokenContext";
 import ReviewCard from './MovieDetails/ReviewCard';
 import RecommendationCard from './RecommendationTab/RecommendationCard';
+import { useNavigate } from 'react-router-dom';
 
 const Profile = () => {
-    const { user, setUser } = useAuth0();
+    const { user, isLoading, isAuthenticated } = useAuth0();
     const { accessToken } = useAuthToken();
+    const navigate= useNavigate();
     const [reviews, setReviews] = useState([]);
     const [recommendations, setRecommendations] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
@@ -43,7 +45,7 @@ const Profile = () => {
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/user/recommendations/${user.sub}`, {
                 headers: {
-                    'Cache-Control': 'no-cache', // Prevent caching
+                    'Cache-Control': 'no-cache',
                     Authorization: `Bearer ${accessToken}`,
                 },
             });
@@ -164,6 +166,12 @@ const Profile = () => {
         setMovies(fetchedMovies);
     };
 
+    const handleNotLoggedIn = () => {
+        setTimeout(() => {
+            navigate("/")
+        }, 5000);
+    }
+
     useEffect(() => {
         if (user && user.hasOwnProperty('sub') && accessToken) {
             fetchReviews();
@@ -176,16 +184,40 @@ const Profile = () => {
         fetchMovies();
     }, [recommendations]);
 
-    if (!user)
+
+
+    if (isLoading){
         return (
             <div className="flex justify-center items-center h-screen">
                 <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
             </div>
         );
+    } else {
+        if (!isAuthenticated) {
+            handleNotLoggedIn();
+            return (
+                <>
+                    <Navbar user={null} />
+                    <div className="flex justify-center items-center h-screen">
+                        <div className="bg-red-500 text-white px-6 py-4 border-0 rounded relative mb-4">
+                            <span className="text-xl inline-block mr-5 align-middle">
+                                <i className="fas fa-bell" />
+                            </span>
+                            <span className="inline-block align-middle mr-8">
+                                <b className="capitalize">Alert:</b> Please login to view your profile. You will be redirected to home in 5 seconds.
+                            </span>
+                        </div>
+                    </div>
+                </>
+            );
+        }
+    }
+        
+        
     return (
         <>
             <Navbar user={user} />
-            <div className="dark:!bg-navy-800 shadow-shadow-500 shadow-3xl rounded-primary relative mx-auto flex h-full w-full max-w-[550px] flex-col items-center bg-white bg-cover bg-clip-border p-[16px] dark:text-white dark:shadow-none shadow-t">
+            <div className="dark:!bg-navy-800 shadow-shadow-500 shadow-3xl rounded-primary relat</div>ive mx-auto flex h-full w-full max-w-[550px] flex-col items-center bg-white bg-cover bg-clip-border p-[16px] dark:text-white dark:shadow-none shadow-t">
                 <div className="relative mt-1 flex h-32 w-full justify-center rounded-xl bg-cover" style={{ backgroundImage: 'url("https://i.ibb.co/FWggPq1/banner.png")' }}>
                     <div className="absolute -bottom-12 flex h-[88px] w-[88px] items-center justify-center rounded-full border-[4px] border-white bg-pink-400">
                         <img className="h-full w-full rounded-full" src={user.hasOwnProperty("picture") ? user.picture : "https://github.com/shadcn.png"} alt="" />

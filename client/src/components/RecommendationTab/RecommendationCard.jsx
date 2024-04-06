@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react'
+import { fetchMovieDetails } from '../Utils/utils'
 
 const RecommendationCard = ({ movie_id, recommendation, handleRecommendationDelete }) => {
     const [movie, setMovie] = useState(null);
 
     useEffect(() => {
-        const fetchMovieDetails = async () => {
-            const response = await fetch(`https://api.themoviedb.org/3/movie/${movie_id}?api_key=034e14c6f2ab0e0ccfeea2a32339ffe3`);
-            const data = await response.json();
-            setMovie(data);
-        };
-        fetchMovieDetails();
+        fetchMovieDetails(movie_id, setMovie);
     }, [movie_id]);
 
 

@@ -5,12 +5,14 @@ import { useParams } from 'react-router-dom'
 import NavBar from '../MainNavBar/NavBar'
 import { useAuth0 } from '@auth0/auth0-react'
 import { FaArrowLeft } from 'react-icons/fa';
+import { fetchRecommendations, fetchMovieDetails } from '../Utils/utils'
 
 const RecommendationPage = () => {
     const navigate = useNavigate();
     const { user } = useAuth0();
     const { movieId } = useParams();
     const [excludeMovieIds, setExcludeMovieIds] = useState([]);
+    const [recommendation, setRecommendation] = useState([]);
     const [movie, setMovie] = useState(null);
 
     const onClick = (movie) => {
@@ -19,31 +21,27 @@ const RecommendationPage = () => {
         }
     }
 
-    const fetchRecommendations = async () => {
-        try {
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/recommendations/${movieId}`, {
-            headers: {
-              'Cache-Control': 'no-cache', // Prevent caching
-            },
-          });
-          const data = await response.json();   
-          setExcludeMovieIds([parseInt(movieId), ...data.map((movie) => movie.movieIdRecommend)]);
-        } catch (error) {
-          alert('Error fetching recommendations: ' + error);
-        }
-      }
+    // const fetchRecommendations = async () => {
+    //     try {
+    //       const response = await fetch(`${process.env.REACT_APP_API_URL}/recommendations/${movieId}`, {
+    //         headers: {
+    //           'Cache-Control': 'no-cache', // Prevent caching
+    //         },
+    //       });
+    //       const data = await response.json();   
+    //       setExcludeMovieIds([parseInt(movieId), ...data.map((movie) => movie.movieIdRecommend)]);
+    //     } catch (error) {
+    //       alert('Error fetching recommendations: ' + error);
+    //     }
+    //   }
 
     useEffect(() => {
-        fetchRecommendations(); 
+        fetchRecommendations(movieId, setRecommendation); 
+        setExcludeMovieIds([parseInt(movieId), ...recommendation.map((movie) => movie.movieIdRecommend)]);
     }, [])
 
     useEffect(() => {
-        const fetchMovieDetails = async () => {
-            const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=034e14c6f2ab0e0ccfeea2a32339ffe3`);
-            const data = await response.json();
-            setMovie(data);
-        };
-        fetchMovieDetails();
+        fetchMovieDetails(movieId, setMovie);
     }, [movieId]);
 
     if (!user || !movie) {

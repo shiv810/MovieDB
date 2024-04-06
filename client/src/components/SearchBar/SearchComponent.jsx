@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
-const SearchComponent = ({onClick, query, excludeMovieIds}) => {
+const SearchComponent = ({ onClick, query, excludeMovieIds }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState([]);
     const [selectedMovie, setSelectedMovie] = useState(null);
@@ -10,6 +10,7 @@ const SearchComponent = ({onClick, query, excludeMovieIds}) => {
     const [selectedCountry, setSelectedCountry] = useState('');
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [searchPerformed, setSearchPerformed] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleSearch = async (query) => {
@@ -40,12 +41,14 @@ const SearchComponent = ({onClick, query, excludeMovieIds}) => {
         } catch (error) {
             console.error('Error searching for movies:', error);
         } finally {
+            setSearchPerformed(true);
             setLoading(false);
         }
+        
     };
 
     useEffect(() => {
-        if(onClick){
+        if (onClick) {
             onClick(selectedMovie);
         }
     }, [selectedMovie]);
@@ -60,7 +63,7 @@ const SearchComponent = ({onClick, query, excludeMovieIds}) => {
 
     useEffect(() => {
         if (searchQuery.trim() !== '') {
-            handleSearch();
+            handleSearch(searchQuery);
         }
     }, [page]);
 
@@ -68,17 +71,21 @@ const SearchComponent = ({onClick, query, excludeMovieIds}) => {
         const makeSearch = async (query) => {
             await handleSearch(query);
         }
-        if(query){
+        if (query) {
             setSearchQuery(query);
             makeSearch(query);
-        }    
+        }
     }, [query]);
+
+    useEffect(() => {
+        setSearchPerformed(false);
+    }, [searchQuery]);
 
     useEffect(() => {
         console.log(searchResults)
     }, [searchResults]);
 
-    useEffect(() => {        
+    useEffect(() => {
         const fetchGenres = async () => {
             const response = await fetch('https://api.themoviedb.org/3/genre/movie/list?api_key=034e14c6f2ab0e0ccfeea2a32339ffe3');
             const data = await response.json();
@@ -96,7 +103,7 @@ const SearchComponent = ({onClick, query, excludeMovieIds}) => {
         fetchCountries();
     }, []);
 
-    
+
     return (
         <>
             <div className="items-center p-4 lg:px-40 md:px-20 flex flex-wrap">
@@ -170,14 +177,23 @@ const SearchComponent = ({onClick, query, excludeMovieIds}) => {
                                 </div>
                             ))
                         ) : (
-                            <div className="flex justify-center items-center h-64 bg-gray-200 rounded-md">
-                                <p className="text-gray-500 text-xl">No results found</p>
-                            </div>
+           
+                            searchPerformed && searchQuery.trim() !== '' && searchResults.length === 0 && (
+                                <div className="flex justify-center items-center h-64 bg-gray-200 rounded-md">
+                                    <p className="text-gray-500 text-xl">No results found</p>
+                                </div>
+                            )
+                            
+                  
                         )}
                     </div>
                 </div>
             </div>
-            {loading && <p className="text-gray-500">Loading...</p>}
+            {loading && <>
+                <div className="fixed inset-0 bg-gray-500 bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+                </div>
+            </>}
             {totalPages > 1 && (
                 <div className="flex justify-center mt-4">
                     {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
