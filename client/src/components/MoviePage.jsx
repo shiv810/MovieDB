@@ -9,7 +9,7 @@ const MoviePage = () => {
     const { movieId } = useParams();
     const {user, isLoading} = useAuth0();
     //const {accessToken} = useAuthToken();
-
+    console.log(movieId)
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">

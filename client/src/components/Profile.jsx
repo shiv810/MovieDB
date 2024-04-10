@@ -6,6 +6,9 @@ import { useAuthToken } from "../AuthTokenContext";
 import ReviewCard from './MovieDetails/ReviewCard';
 import RecommendationCard from './RecommendationTab/RecommendationCard';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { toastProps } from './Utils/utils';
 
 const Profile = () => {
     const { user, isLoading, isAuthenticated } = useAuth0();
@@ -38,7 +41,7 @@ const Profile = () => {
             const data = await response.json();
             setReviews(data);
         } catch (error) {
-            alert('Error fetching reviews: ' + error);
+            toast.error('Error fetching reviews: ' + error, toastProps);
         }
     };
     const fetchRecommendations = async () => {
@@ -52,7 +55,7 @@ const Profile = () => {
             const data = await response.json();
             setRecommendations(data);
         } catch (error) {
-            alert('Error fetching recommendations: ' + error);
+            toast.error('Error fetching recommendations: ' + error, toastProps);
         }
     }
 
@@ -70,7 +73,7 @@ const Profile = () => {
                 setEditedEmail(data.email);
             }
         } catch (error) {
-            alert('Error fetching user: ' + error);
+            toast.error('Error fetching user: ' + error, toastProps);
         }
     }
 
@@ -89,7 +92,7 @@ const Profile = () => {
             }
             fetchReviews();
         } catch (error) {
-            alert('Error updating review: ' + error);
+            toast.error('Error updating review: ' + error, toastProps);
         }
     };
     const handleReviewDelete = async (review) => {
@@ -105,7 +108,7 @@ const Profile = () => {
             }
             fetchReviews();
         } catch (error) {
-            alert('Error deleting review: ' + error);
+            toast.error('Error deleting review: ' + error, toastProps);
         }
     };
 
@@ -127,7 +130,7 @@ const Profile = () => {
             const updatedMovies = movies.filter((_, i) => i !== index);
             setMovies(updatedMovies);
         } catch (error) {
-            alert('Error deleting recommendation: ' + error);
+            toast.error('Error deleting recommendation: ' + error, toastProps);
         }
     };
 
@@ -152,7 +155,7 @@ const Profile = () => {
             fetchUser();
             setIsEditing(false);
         } catch (error) {
-            alert('Error updating user: ' + error);
+            toast.error('Error updating user: ' + error, toastProps);
         }
     }
 
@@ -216,6 +219,7 @@ const Profile = () => {
         
     return (
         <>
+            <ToastContainer />
             <Navbar user={user} />
             <div className="dark:!bg-navy-800 shadow-shadow-500 shadow-3xl rounded-primary relat</div>ive mx-auto flex h-full w-full max-w-[550px] flex-col items-center bg-white bg-cover bg-clip-border p-[16px] dark:text-white dark:shadow-none shadow-t">
                 <div className="relative mt-1 flex h-32 w-full justify-center rounded-xl bg-cover" style={{ backgroundImage: 'url("https://i.ibb.co/FWggPq1/banner.png")' }}>

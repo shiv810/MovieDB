@@ -28,6 +28,7 @@ const Home = () => {
         setLoading(false);
       } catch (error) {
         console.error('Error fetching movies:', error);
+        setLoading(false); // Stop loading state on error
       }
     };
 
@@ -56,7 +57,7 @@ const Home = () => {
 
         setWatchlist(updatedWatchlist);
       } catch (error) {
-        alert('Error fetching watchlist: ' + error);
+        console.error('Error fetching watchlist:', error);
       }
     };
 
@@ -72,7 +73,7 @@ const Home = () => {
   }
 
   return (
-    <div className='home text-center'>
+    <>
       <NavBar user={user} />
       <div className="bg-gray-900 text-white">
         {isAuthenticated ? (
@@ -83,7 +84,7 @@ const Home = () => {
                   <div className="carousel-caption z-[10] p-10 w-full h-full flex flex-col-reverse pb-20" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
                     <div>
                       <h3 className=''>{movie.title}</h3>
-                      <button onClick={() => window.location.href = `/movies/${movie.id}`} className="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
+                      <button onClick={() => navigate(`/movies/${movie.id}`)} className="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
                         View Details
                       </button>
                     </div>
@@ -134,7 +135,7 @@ const Home = () => {
           ))}
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
