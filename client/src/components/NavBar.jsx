@@ -78,7 +78,7 @@ const NavBar = ({ user, toast}) => {
                         <div className="z-[1] origin-top-right absolute right-0 mt-2 w-58 min-w-28 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" aria-label="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                             <div className="block py-1 h-full" aria-label="none">
                                 <Link to="/profile" className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-300 h-full" aria-label="profileWeb" rel="noopener noreferrer">Profile</Link>
-                                <button onClick={() => logout()} className="block w-full bg-gray-100 h-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-300 h-full" aria-label="logoutWeb">Sign out</button>
+                                <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })} className="block w-full bg-gray-100 h-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-300 h-full" aria-label="logoutWeb">Sign out</button>
                             </div>
                         </div>
                     )}
@@ -97,7 +97,7 @@ const NavBar = ({ user, toast}) => {
                         {isAuthenticated && (
                             <>
                                 <Link to="/profile" className="text-white text-center h-full" aria-label='profileMobile'>Profile</Link>
-                                <button onClick={() => logout()} className="bg-red-500 text-white font-semibold py-2 px-4 rounded mx-auto hover:border-indigo-500 hover:bg-transparent h-full" aria-label="logoutMobile" rel="noopener noreferrer">Sign out</button>
+                                <button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })} className="bg-red-500 text-white font-semibold py-2 px-4 rounded mx-auto hover:border-indigo-500 hover:bg-transparent h-full" aria-label="logoutMobile" rel="noopener noreferrer">Sign out</button>
                             </>
                         )}
                         {!isAuthenticated && (
