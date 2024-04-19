@@ -43,5 +43,35 @@ You can recommend movies to other users and also see the recommendations given b
 
 ## Hosting
  
- The website has been hosted on Vercel and can be accessed [here](https://movie-database-app.vercel.app/).
+ - The website has been hosted on Vercel and can be accessed [here](https://themoviedb-lake.vercel.app//).
+ - The backend has been hosted on Heroku and can be accessed [here](https://assignment-03-shivaditya.onrender.com/).
 
+## API Endpoints
+
+1. **Public Endpoints:**
+   - `GET /ping`: Returns "pong" as a response. No authentication required.
+
+2. **User Endpoints:**
+   - `GET /users/:auth0Id`: Get a user by their Auth0 ID. Requires authentication.
+   - `PUT /users/:auth0Id`: Update a user by their Auth0 ID. Requires authentication.
+   - `GET /user/reviews/:auth0Id`: Get all reviews made by a user. Requires authentication.
+   - `GET /user/recommendations/:auth0Id`: Get all recommendations made by a user. Requires authentication.
+
+3. **Review Endpoints:**
+   - `GET /reviews/:movieId`: Get all reviews for a movie.
+   - `POST /reviews`: Create a new review. Requires authentication.
+   - `PUT /reviews/:reviewId`: Update a review. Requires authentication.
+   - `DELETE /reviews/:reviewId`: Delete a review. Requires authentication.
+
+4. **Recommendation Endpoints:**
+   - `GET /recommendations/:movieId`: Get all recommendations for a movie.
+   - `POST /recommendations`: Create a new recommendation. Requires authentication.
+   - `DELETE /recommendations/:recommendationId`: Delete a recommendation. Requires authentication.
+
+5. **Watchlist Endpoints:**
+   - `GET /watchlist`: Get all movies in the watchlist for the user. Requires authentication.
+   - `POST /watchlist`: Add a movie to the watchlist for the user. Requires authentication.
+   - `DELETE /watchlist/:movieId`: Remove a movie from the watchlist for the user. Requires authentication.
+
+6. **Authentication Endpoints:**
+   - `POST /verify-user`: Create a new user if it doesn't exist.
