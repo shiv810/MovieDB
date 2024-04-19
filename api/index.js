@@ -5,6 +5,7 @@ import pkg from "@prisma/client";
 import morgan from "morgan";
 import cors from "cors";
 import { auth } from "express-oauth2-jwt-bearer";
+const PORT = parseInt(process.env.PORT) || 8080;
 
 // this is a middleware that will validate the access token sent by the client
 const requireAuth = auth({
@@ -394,6 +395,7 @@ app.delete("/watchlist/:movieId", requireAuth, async (req, res) => {
   }
 });
 
-app.listen(8000, () => {
-  console.log("Server running on http://localhost:8000 🎉 🚀");
-});
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT} 🎉 🚀`);
+ });
+ 
