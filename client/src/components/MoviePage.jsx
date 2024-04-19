@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
-import MovieDetails from './MovieDetails/MovieDetails';
-import NavBar from './MainNavBar/NavBar';
+import MovieDetails from './MovieDetails';
+import NavBar from './NavBar';
 import { useAuth0 } from '@auth0/auth0-react';
-import { useAuthToken } from '../AuthTokenContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import MainFooter from './MainFooter';
 
 const MoviePage = () => {
     const { movieId } = useParams();
     const {user, isLoading} = useAuth0();
-    //const {accessToken} = useAuthToken();
-    console.log(movieId)
     if (isLoading) {
         return (
             <div className="flex justify-center items-center h-screen">
@@ -19,8 +19,10 @@ const MoviePage = () => {
     }
     return (
         <>
-            <NavBar user={user}/>
-            <MovieDetails movieId={movieId} />
+            <ToastContainer />
+            <NavBar user={user} toast={toast}/>
+            <MovieDetails movieId={movieId} toast={toast} />
+            <MainFooter />
         </>
   )
 }

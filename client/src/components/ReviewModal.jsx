@@ -1,11 +1,20 @@
 import { useEffect, useState } from 'react';
 import { StarIcon } from '@heroicons/react/24/solid'
+import { toastProps } from './Utils/utils';
 
-function ReviewModal({ isOpen, onClose, onAddReview, defaultValueText, defaultValueStars}) {
+function ReviewModal({ isOpen, onClose, onAddReview, defaultValueText, defaultValueStars, toast}) {
     const [newReview, setNewReview] = useState(defaultValueText || '');
     const [stars, setStars] = useState(defaultValueStars || 0);
 
     const handleAddReview = () => {
+        if (newReview === undefined) {
+            toast.error('Review cannot be empty', toastProps);
+            return;
+        }
+        if(stars === 0) {
+            toast.error('Enter a valid value for stars.', toastProps);
+            return;
+        }
         onAddReview({ text: newReview, stars });
         setNewReview('');
         setStars(0);
@@ -53,7 +62,7 @@ function ReviewModal({ isOpen, onClose, onAddReview, defaultValueText, defaultVa
                     <div className='bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse'>
                         <button
                             onClick={handleAddReview}
-                            className='w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm'>
+                            className='w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-base focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm'>
                             Add review
                         </button>
                         <button

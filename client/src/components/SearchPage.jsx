@@ -1,9 +1,12 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
-import NavBar from '../MainNavBar/NavBar'
+import NavBar from './NavBar'
 import { useAuth0 } from '@auth0/auth0-react'
 import SearchComponent from './SearchComponent'
 import { useNavigate } from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import MainFooter from './MainFooter'
 
 const SearchPage = () => {
     const {query} = useParams()
@@ -27,8 +30,10 @@ const SearchPage = () => {
 
   return (
     <div>
-      <NavBar user={user} />
-      <SearchComponent query={query} onClick={onClick} />
+      <ToastContainer />
+      <NavBar user={user} toast={toast} />
+      <SearchComponent query={query} onClick={onClick} toast={toast}/>
+      <MainFooter />
     </div>
   )
 }

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuthToken } from '../../AuthTokenContext';
+import { useAuthToken } from '../AuthTokenContext';
 import RecommendationCard from './RecommendationCard';
+import { toastProps } from './Utils/utils';
 
-function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAddRecommendation }) {
+function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAddRecommendation, toast }) {
     const { accessToken } = useAuthToken();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -34,7 +35,11 @@ function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAd
     }
 
     const handleSubmit = () => {
-        const comment = document.getElementById('userComments').value;
+        const comment = document.getElementById('userComments').value.trim();
+        if(!comment) {
+            toast.error('Comment cannot be empty', toastProps);
+            return;
+        }
         handleAddRecommendation({ movieId: recommendMovieID, comment: comment ? comment : 'No comment' })
         navigate(`/movies/${movieIdParent}`);
         setRecommendMovieID(0);
@@ -47,7 +52,7 @@ function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAd
 
     const handleAddRecommendationButtonClick = () => {
         if (!accessToken) {
-            alert('You must be logged in to add a movie to the watchlist');
+            toast.error('You must be logged in to recommend a movie', toastProps);
             return;
         }
         navigate(`/recommendations/${movieIdParent}`)
@@ -75,7 +80,7 @@ function RecommendationsTab({ recommendations, movieId, recommendedURL, handleAd
                             </div>
                         </div>
                         <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                            <button type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm" onClick={handleSubmit}>
+                            <button type="button" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-base focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm" onClick={handleSubmit}>
                                 Submit
                             </button>
                             <button type="button" className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm" onClick={handleCancel}>

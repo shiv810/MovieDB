@@ -2,8 +2,8 @@ import React from "react";
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 import { useAuth0 } from "@auth0/auth0-react";
-import MovieDetails from "./MovieDetails";
-import { useAuthToken } from "../../AuthTokenContext";
+import MovieDetails from "../components/MovieDetails";
+import { useAuthToken } from "../AuthTokenContext";
 
 jest.mock("@auth0/auth0-react", () => ({
   useAuth0: jest.fn(() => ({
@@ -11,7 +11,7 @@ jest.mock("@auth0/auth0-react", () => ({
   })),
 }));
 
-jest.mock("../../AuthTokenContext");
+jest.mock("../AuthTokenContext");
 
 jest.mock("react-router-dom", () => ({
   useNavigate: () => jest.fn(),
@@ -28,7 +28,7 @@ describe("MovieDetails component: Without Auth", () => {
   test("Title: renders movie title correctly", async () => {
     const movieId = 1011985;
     render(<MovieDetails movieId={movieId} />);
-    expect(screen.getByRole('loadingSpinner')).toBeInTheDocument();
+    expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -42,17 +42,17 @@ describe("MovieDetails component: Without Auth", () => {
   test("Overview: renders movie overview correctly", async () => {
     const movieId = 1011985;
     render(<MovieDetails movieId={movieId} />);
-    expect(screen.getByRole('loadingSpinner')).toBeInTheDocument();
+    expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     });
     //Check if the overview is in the document
-    const overview = screen.getByRole('overview');
+    const overview = screen.getByLabelText('overview');
     expect(overview).toBeInTheDocument();
 
     //Get overviewBody role
-    const overviewBody = screen.getByRole('overviewBody');
+    const overviewBody = screen.getByLabelText('overviewBody');
     expect(overviewBody).toHaveTextContent("Po is gearing up to become the spiritual leader of his Valley of Peace, but also needs someone to take his place as Dragon Warrior. As such, he will train a new kung fu practitioner for the spot and will encounter a villain called the Chameleon who conjures villains from the past.");
   });
 
@@ -60,14 +60,14 @@ describe("MovieDetails component: Without Auth", () => {
   test("Release Date: renders movie release data correctly", async () => {
     const movieId = 1011985;
     render(<MovieDetails movieId={movieId} />);
-    expect(screen.getByRole('loadingSpinner')).toBeInTheDocument();
+    expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
     //Get releaseDate role
-    const releaseDate = screen.getByRole('releaseDate');
+    const releaseDate = screen.getByLabelText('releaseDate');
     expect(releaseDate).toBeInTheDocument();
 
     //Get releaseDate value and match it with the expected value
@@ -78,14 +78,14 @@ describe("MovieDetails component: Without Auth", () => {
   test("Runtime: renders movie runtime correctly", async () => {
     const movieId = 1011985;
     render(<MovieDetails movieId={movieId} />);
-    expect(screen.getByRole('loadingSpinner')).toBeInTheDocument();
+    expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
     //Get runtime role
-    const runtime = screen.getByRole('runtime');
+    const runtime = screen.getByLabelText('runtime');
     expect(runtime).toBeInTheDocument();
 
     //Get runtime value and match it with the expected value
@@ -96,14 +96,14 @@ describe("MovieDetails component: Without Auth", () => {
   test("Add to Watchlist button: does the button works as expected", async () => {
     const movieId = 1011985;
     render(<MovieDetails movieId={movieId} />);
-    expect(screen.getByRole('loadingSpinner')).toBeInTheDocument();
+    expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
     //Get Add to Watchlist button
-    const addToWatchlistButton = screen.getByRole('addToWatchlistButton');
+    const addToWatchlistButton = screen.getByLabelText('addToWatchlistButton');
     expect(addToWatchlistButton).toBeInTheDocument();
 
     //Click Add to Watchlist button
@@ -118,14 +118,14 @@ describe("MovieDetails component: Without Auth", () => {
   test("Add Review Button: does the button work as expected", async () => {
     const movieId = 1011985;
     render(<MovieDetails movieId={movieId} />);
-    expect(screen.getByRole('loadingSpinner')).toBeInTheDocument();
+    expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
     //Get Add Review button
-    const addReviewButton = screen.getByRole('addReviewButton');
+    const addReviewButton = screen.getByLabelText('addReviewButton');
     expect(addReviewButton).toBeInTheDocument();
 
     //Click Add Review button
@@ -231,13 +231,13 @@ describe("MovieDetails component: With Auth", () => {
   test("Renders with auth without crashing", async () => {
     const movieId = 1011985;
     render(<MovieDetails movieId={movieId} />);
-    expect(screen.getByRole('loadingSpinner')).toBeInTheDocument();
+    expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 4000));
     });
 
-    console.log(screen.debug());
+
     const originalTitle = () => screen.queryByText("Kung Fu Panda 4");
     expect(originalTitle()).toBeInTheDocument();
   })
@@ -246,14 +246,14 @@ describe("MovieDetails component: With Auth", () => {
   test("Add to Watchlist button: Adds the movie to watchlist and shows a toast and the button changes to Remove from Watchlist", async () => {
     const movieId = 1011985;
     render(<MovieDetails movieId={movieId} />);
-    expect(screen.getByRole('loadingSpinner')).toBeInTheDocument();
+    expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
     //Get Add to Watchlist button
-    const addToWatchlistButton = screen.getByRole('addToWatchlistButton');
+    const addToWatchlistButton = screen.getByLabelText('addToWatchlistButton');
     expect(addToWatchlistButton).toBeInTheDocument();
 
     //Click Add to Watchlist button
@@ -269,7 +269,7 @@ describe("MovieDetails component: With Auth", () => {
     expect(snackbar).toHaveTextContent("Movie added to watchlist");
 
     //Get Remove from Watchlist button
-    const removeFromWatchlistButton = screen.getByRole('removeFromWatchlistButton');
+    const removeFromWatchlistButton = screen.getByLabelText('removeFromWatchlistButton');
     expect(removeFromWatchlistButton).toBeInTheDocument();
   });
 
@@ -277,14 +277,14 @@ describe("MovieDetails component: With Auth", () => {
   test("Remove from Watchlist button: First adds the movie to watchlist and then removes it from the watchlist and shows a toast and the button changes to Add to Watchlist", async () => {
     const movieId = 1011985;
     render(<MovieDetails movieId={movieId} />);
-    expect(screen.getByRole('loadingSpinner')).toBeInTheDocument();
+    expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
     //Get Add to Watchlist button
-    const addToWatchlistButton = screen.getByRole('addToWatchlistButton');
+    const addToWatchlistButton = screen.getByLabelText('addToWatchlistButton');
     expect(addToWatchlistButton).toBeInTheDocument();
 
     //Click Add to Watchlist button
@@ -300,7 +300,7 @@ describe("MovieDetails component: With Auth", () => {
     expect(snackbar).toHaveTextContent("Movie added to watchlist");
 
     //Get Remove from Watchlist button
-    const removeFromWatchlistButton = screen.getByRole('removeFromWatchlistButton');
+    const removeFromWatchlistButton = screen.getByLabelText('removeFromWatchlistButton');
     expect(removeFromWatchlistButton).toBeInTheDocument();
 
     //Click Remove from Watchlist button
@@ -318,7 +318,7 @@ describe("MovieDetails component: With Auth", () => {
     expect(snackbars[1]).toHaveTextContent("Movie removed from watchlist");
 
     //Get Add to Watchlist button
-    const addToWatchlistButton2 = screen.getByRole('addToWatchlistButton');
+    const addToWatchlistButton2 = screen.getByLabelText('addToWatchlistButton');
     expect(addToWatchlistButton2).toBeInTheDocument();
   });
 

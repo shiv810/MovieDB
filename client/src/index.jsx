@@ -6,12 +6,12 @@ import Home from "./components/Home";
 import { Auth0Provider } from "@auth0/auth0-react";
 import VerifyUser from "./components/VerifyUser";
 import { AuthTokenProvider } from "./AuthTokenContext";
-import RecommendationPage from "./components/RecommendationPage/RecommendationPage";
+import RecommendationPage from "./components/RecommendationPage";
 import './styles.css';
 import MoviePage from "./components/MoviePage";
 import Profile from "./components/Profile";
 import AuthDebugger from "./components/AuthDebugger";
-import SearchPage from "./components/SearchBar/SearchPage";
+import SearchPage from "./components/SearchPage";
 
 const container = document.getElementById("root");
 const root = ReactDOMClient.createRoot(container);

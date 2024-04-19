@@ -1,14 +1,15 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import Navbar from './MainNavBar/NavBar';
+import Navbar from './NavBar';
 import { Tabs } from "flowbite-react";
 import React, { useEffect, useState } from 'react';
 import { useAuthToken } from "../AuthTokenContext";
-import ReviewCard from './MovieDetails/ReviewCard';
-import RecommendationCard from './RecommendationTab/RecommendationCard';
+import ReviewCard from './ReviewCard';
+import RecommendationCard from './RecommendationCard';
 import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { toastProps } from './Utils/utils';
+import MainFooter from './MainFooter';
 
 const Profile = () => {
     const { user, isLoading, isAuthenticated } = useAuth0();
@@ -17,6 +18,7 @@ const Profile = () => {
     const [reviews, setReviews] = useState([]);
     const [recommendations, setRecommendations] = useState([]);
     const [isEditing, setIsEditing] = useState(false);
+    const [userDetails, setUserDetails] = useState({}); 
     const [editedName, setEditedName] = useState('');
     const [editedEmail, setEditedEmail] = useState('');
     const [movies, setMovies] = useState([]);
@@ -28,6 +30,13 @@ const Profile = () => {
     const handleEmailChange = (e) => {
         setEditedEmail(e.target.value);
     };
+
+    const handleChangeCancel = (e) => {
+        e.preventDefault();
+        setIsEditing(false);
+        setEditedName(userDetails.name);
+        setEditedEmail(userDetails.email);
+    }
 
     const fetchReviews = async () => {
         try {
@@ -68,6 +77,7 @@ const Profile = () => {
             });
             const data = await response.json();
             if (data && data.email && data.name) {
+                setUserDetails(data);
                 setEditedName(data.name);
                 setEditedEmail(data.email);
             }
@@ -134,6 +144,14 @@ const Profile = () => {
 
     const handleUpdateProfile = async (e) => {
         e.preventDefault();
+        if(editedName.trim() === '' || editedEmail.trim() === ''){
+            toast.error('Updated Name or Email cannot be empty', toastProps);
+            return;
+        }
+        if (!editedEmail.includes('@') || !editedEmail.includes('.')) {
+            toast.error('Invalid email address', toastProps);
+            return;
+        }
         try {
             const response = await fetch(`${process.env.REACT_APP_API_URL}/users/${user.sub}`, {
                 method: 'PUT',
@@ -217,11 +235,11 @@ const Profile = () => {
     return (
         <>
             <ToastContainer />
-            <Navbar user={user} />
+            <Navbar user={user} toast={toast}/>
             <div className="dark:!bg-navy-800 shadow-shadow-500 shadow-3xl rounded-primary relat</div>ive mx-auto flex h-full w-full max-w-[550px] flex-col items-center bg-white bg-cover bg-clip-border p-[16px] dark:text-white dark:shadow-none shadow-t">
                 <div className="relative mt-1 flex h-32 w-full justify-center rounded-xl bg-cover" style={{ backgroundImage: 'url("https://i.ibb.co/FWggPq1/banner.png")' }}>
                     <div className="absolute -bottom-12 flex h-[88px] w-[88px] items-center justify-center rounded-full border-[4px] border-white bg-pink-400">
-                        <img className="h-full w-full rounded-full" src={user.hasOwnProperty("picture") ? user.picture : "https://github.com/shadcn.png"} alt="" />
+                        <img className="h-full w-full rounded-full" src={user.hasOwnProperty("picture") ? user.picture : "https://github.com/shadcn.png"} alt="User's Avatar" />
                     </div>
                 </div>
                 <div className="mt-16 flex flex-col items-center">
@@ -262,7 +280,7 @@ const Profile = () => {
                                             <input
                                                 type="text"
                                                 id="Auth0Id"
-                                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                className="bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                 placeholder="Your Auth0Id"
                                                 value={user.sub}
                                                 disabled={true}
@@ -273,7 +291,7 @@ const Profile = () => {
                                             <input
                                                 type="text"
                                                 id="email_verified"
-                                                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                                className="bg-gray-300 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                                 placeholder="Email verified"
                                                 value={user.email_verified?.toString()}
                                                 disabled={true}
@@ -285,7 +303,7 @@ const Profile = () => {
                                         )}
                                         {isEditing && (
                                             <div className="flex justify-between gap-5">
-                                                <button onClick={() => setIsEditing(false)} className="text-white bg-gray-400 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Cancel</button>
+                                                <button onClick={handleChangeCancel} className="text-white bg-gray-400 hover:bg-gray-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-800">Cancel</button>
                                                 <button type="submit" className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" onClick={handleUpdateProfile}>Submit Changes</button>
                                             </div>
                                         )}
@@ -319,8 +337,10 @@ const Profile = () => {
                     </div>
                 </div>
             </div>
+            <MainFooter />
         </>
     );
 };
 
 export default Profile;
+

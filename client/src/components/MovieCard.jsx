@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 const MovieCard = (movie) => {
     const navigate = useNavigate();
     return (
-        <article key={movie.id} className="bg-gray-300 rounded-lg overflow-hidden h-full min-h-400px">
+        <article key={movie.id} className="bg-gray-300 rounded-lg overflow-hidden h-full min-h-400px" aria-label="movieCard">
             <img
                 src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                 alt={`Poster of ${movie.title}`}
@@ -18,7 +18,7 @@ const MovieCard = (movie) => {
                         Release Date: <time dateTime={movie.release_date}>{movie.release_date}</time>
                     </p>
                     <p className="">
-                        Rating: <span>{movie.vote_average}/10</span>
+                        Rating: <span>{Math.round(movie.vote_average * 10) / 10}/10</span>
                     </p>
                 </div>
                 <button onClick={() => navigate(`/movies/${movie.id}`)} className="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded" aria-label='click-for-more-details-on-movie'>

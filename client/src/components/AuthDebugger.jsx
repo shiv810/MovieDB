@@ -1,7 +1,10 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import { useAuthToken } from "../AuthTokenContext";
-import Navbar from './MainNavBar/NavBar'
+import Navbar from './NavBar'
 import React from 'react'
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import MainFooter from './MainFooter';
 
 const AuthDebugger = () => {
     const { user, isLoading } = useAuth0()
@@ -15,11 +18,13 @@ const AuthDebugger = () => {
             </div>
         );
     return (
-        <>
-            <Navbar user={user} />
+        <>  
+            <ToastContainer />
+            <Navbar user={user} toast={toast}/>
             <div>
                 <h1 className="text-4xl text-center font-semibold mt-4">Auth Debugger</h1>
             </div>
+            <div className='flex flex-col min-h-screen justify-between'>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 {user ? (
                     <>
@@ -38,6 +43,8 @@ const AuthDebugger = () => {
                         <pre className="overflow-x-auto bg-gray-200 rounded-lg p-4">No user logged in</pre>
                     </div>
                 )}
+            </div>
+            <MainFooter />
             </div>
         </>
     )
