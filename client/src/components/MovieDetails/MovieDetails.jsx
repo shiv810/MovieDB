@@ -113,10 +113,10 @@ const MovieDetails = ({ movieId }) => {
   }
 
   useEffect(() => {
+    console.log("Fetch Movie Details")
     fetchMovieDetails(movieId, setMovieDetails, toast);
     fetchReviews(movieId, setReviews, toast);
     fetchRecommendations(movieId, setRecommendations, toast);
-
     if (window.location.href.includes('recommended')) {
       setIsReviewTabOpen(false);
       setIsRecommendationTabOpen(true);
@@ -140,9 +140,11 @@ const MovieDetails = ({ movieId }) => {
 
 
   if (movieJSON === null || movieJSON.original_title === undefined || isLoading) {
+    console.log(movieJSON, isLoading)
     return(
       <div className="flex justify-center items-center h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" role="loadingSpinner">
+        </div>
       </div>
     );
   }
@@ -152,31 +154,27 @@ const MovieDetails = ({ movieId }) => {
       <ToastContainer />
       <div className="flex flex-col w-full">
         <div className='flex flex-row w-full'>
-          <div className='relative w-full bg-no-repeat bg-cover ' style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(https://image.tmdb.org/t/p/w500${movieJSON.poster_path})` }}>
+          <div className='relative w-full bg-no-repeat bg-cover ' style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(https://image.tmdb.org/t/p/w500${movieJSON.poster_path || ''})` }}>
             <div className='p-4 lg:px-40 md:px-20 flex flex flex-row flex-wrap'>
               <div className=''>
                 <img src={`https://image.tmdb.org/t/p/w500${movieJSON.poster_path}`} alt={movieJSON.original_title} className='w-72 h-90' />
               </div>
               <div className='pt-10'>
                 <div className='flex flex-row'>
-                  <h1 className='text-4xl font-bold text-gray-200'>{movieJSON.original_title.substring(0, 100)}</h1>
-                  <h2 className='text-4xl ml-2 text-gray-200'>({movieJSON.release_date.split('-')[0]})</h2>
+                  <h1 className='text-4xl font-bold text-gray-200' role="movieTitle">{(movieJSON.original_title ).substring(0, 100)}</h1>
+                  <h2 className='text-4xl ml-2 text-gray-200'>({(movieJSON.release_date || 'Unknown') === '999999' ? 'Unknown' : (movieJSON.release_date || 'Unknown').split('-')[0]})</h2>
                 </div>
                 <div className='flex flex-row flex-wrap'>
-                  <span className='text-md ml-1 text-gray-200'>{movieJSON.release_date ? new Date(movieJSON.release_date).toISOString().split('T')[0] : "Unknown"} (US)</span>
-                  {movieJSON.genres.map((genre) => (
+                  <span className='text-md ml-1 text-gray-200' role="releaseDate">{movieJSON.release_date ? new Date(movieJSON.release_date).toISOString().split('T')[0] : "Unknown"} (US)</span>
+                  {(movieJSON.genres || []).map((genre) => (
                     <span key={genre.id} className='text-md ml-1 text-gray-200'>{genre.name}</span>
                   ))}
-                  <span className='text-md ml-1 text-gray-200'>{Math.floor(movieJSON.runtime / 60)}h {movieJSON.runtime % 60}min</span>
+                  <span className='text-md ml-1 text-gray-200' role="runtime">{movieJSON.runtime ? `${Math.floor((movieJSON.runtime || 0) / 60)}hr ${(movieJSON.runtime || 0) % 60}min` : 'Unknown'}</span>
                 </div>
                 <div className='flex flex-row mt-5 items-center'>
                   <div className='relative w-14 h-14'>
-                    <svg className='absolute top-0 left-0' width='100%' height='100%' viewBox='0 0 100 100' fill="#081c22" xmlns='http://www.w3.org/2000/svg'>
-                      <circle cx='50' cy='50' r='48' stroke='#081c22' strokeWidth='4' />
-                      <circle cx='50' cy='50' r='48' stroke='#21d07a' strokeWidth='4' strokeDasharray={`${(movieJSON.vote_average * 10) * 3.14} 301.592`} strokeLinecap='round' />
-                    </svg>
-                    <div className='absolute top-0 left-0 flex items-center justify-center w-14 h-14'>
-                      <span className='text-sm text-white'>{Math.round(movieJSON.vote_average * 10)}%</span>
+                   <div className={`rounded-md w-14 h-14 flex items-center justify-center ${Math.round((movieJSON.vote_average || 0) * 10) > 80 ? 'bg-green-500' : Math.round((movieJSON.vote_average || 0) * 10) > 60 ? 'bg-yellow-500' : Math.round((movieJSON.vote_average || 0) * 10) > 40 ? 'bg-orange-500' : 'bg-red-500'}`}>
+                      <span className='text-lg font-bold text-white'>{Math.round((movieJSON.vote_average || 0) * 10)}%</span>
                     </div>
                   </div>
                   <div className='ml-2'>
@@ -189,6 +187,7 @@ const MovieDetails = ({ movieId }) => {
                       className='mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-52'
                       onClick={HandleWatchlistRemove}
                       disabled={isMutatingWatchlist}
+                      role="removeFromWatchlistButton"
                     >
                       {isMutatingWatchlist ? <Spinner /> : 'Remove From your Watchlist'}
                     </button>
@@ -197,6 +196,7 @@ const MovieDetails = ({ movieId }) => {
                       className='mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-52'
                       onClick={onClickAddToWatchlist}
                       disabled={isMutatingWatchlist}
+                      role="addToWatchlistButton"
                     >
                       {isMutatingWatchlist ? <Spinner /> : 'Add to your watchlist'}
                     </button>
@@ -205,9 +205,9 @@ const MovieDetails = ({ movieId }) => {
                     Watch trailer
                   </button>
                 </div>
-                <div>
-                  <h2 className='text-2xl mt-5 text-white'>Overview</h2>
-                  <p className='text-md mt-2 text-white max-w-5xl'>{movieJSON.overview}</p>
+                <div role="overview">
+                  <h2 className='text-2xl mt-5 text-white' role="overviewHeading">Overview</h2>
+                  <p className='text-md mt-2 text-white max-w-5xl' role="overviewBody">{movieJSON.overview || 'Unknown'}</p>
                 </div>
               </div>
             </div>
@@ -225,7 +225,7 @@ const MovieDetails = ({ movieId }) => {
                       <ReviewCard user={review.user} stars={review.stars} time={review.time} content={review.content} movieId={movieId} id={review.id} key={index} />
                     ))}
                   </div>
-                  <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5' onClick={() => handleAddReviewButtonClick()}>Add Review</button>
+                  <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-5' onClick={() => handleAddReviewButtonClick()} role="addReviewButton">Add Review</button>
                   <ReviewModal
                     isOpen={isOpened}
                     onClose={() => setIsOpened(false)}

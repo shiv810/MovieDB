@@ -20,7 +20,6 @@ const Profile = () => {
     const [editedName, setEditedName] = useState('');
     const [editedEmail, setEditedEmail] = useState('');
     const [movies, setMovies] = useState([]);
-    const [movieParent, setMovieParent] = useState([]);
 
     const handleNameChange = (e) => {
         setEditedName(e.target.value);
@@ -123,10 +122,8 @@ const Profile = () => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            // Update recommendations array
             const updatedRecommendations = recommendations.filter((_, i) => i !== index);
             setRecommendations(updatedRecommendations);
-            // Update movies array
             const updatedMovies = movies.filter((_, i) => i !== index);
             setMovies(updatedMovies);
         } catch (error) {

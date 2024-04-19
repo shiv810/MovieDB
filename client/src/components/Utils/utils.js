@@ -1,6 +1,7 @@
 const fetchReviews = async (movieId, setReviews, toast) => {
   try {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/reviews/${movieId}`, {
+      method: 'GET',
       headers: {
         'Cache-Control': 'no-cache',
       },
@@ -39,6 +40,7 @@ const fetchWatchlist = async (accessToken, setWatchlist, toast) => {
   const fetchRecommendations = async (movieId, setRecommendations, toast) => {
     try {
       const response = await fetch(`${process.env.REACT_APP_API_URL}/recommendations/${movieId}`, {
+        method: 'GET',
         headers: {
           'Cache-Control': 'no-cache',
         },
@@ -58,6 +60,7 @@ const fetchWatchlist = async (accessToken, setWatchlist, toast) => {
     try {
       const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=034e14c6f2ab0e0ccfeea2a32339ffe3`);
       const data = await response.json();
+      data.movieId = data.movieId || movieId;
       setMovieDetails(data);
     } catch (error) {
       if (toast) {

@@ -77,12 +77,12 @@ const Home = () => {
       <NavBar user={user} />
       <div className="bg-gray-900 text-white">
         {isAuthenticated ? (
-          <div className="carousel h-[25rem]">
+          <div className="carousel h-[25rem] flex justify-center items-center">
             <Carousel>
               {movies.slice(0, 10).map((movie, index) => (
                 <div key={index} className="carousel-item bg-cover bg-center h-screen flex items-end max-h-[25rem] z-[2]" style={{ backgroundImage: `url(https://image.tmdb.org/t/p/w500${movie.poster_path})` }}>
-                  <div className="carousel-caption z-[10] p-10 w-full h-full flex flex-col-reverse pb-20" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
-                    <div>
+                  <div className="carousel-caption z-[10] p-4 lg:px-40 md:px-20  w-full h-full flex flex-col-reverse pb-20" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+                    <div className="flex flex-col items-center justify-center">
                       <h3 className=''>{movie.title}</h3>
                       <button onClick={() => navigate(`/movies/${movie.id}`)} className="mt-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded">
                         View Details

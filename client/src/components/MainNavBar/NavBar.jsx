@@ -11,8 +11,8 @@ const NavBar = ({ user }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const menuOptions = {
         center: [
-            { name: 'Home', link: '/' },
-            { name: 'Auth Debugger', link: '/authDebugger' },
+            { name: 'Home', link: '/', auth: false },
+            { name: 'Auth Debugger', link: '/authDebugger', auth: true },
         ]
     };
 
@@ -30,14 +30,14 @@ const NavBar = ({ user }) => {
                 {/* Logo */}
                 <p className="text-white font-semibold">MovieDB</p>
 
-                {/* Menu items for normal view */}
+                {/* Menu items for normal view and Search Bar */}
                 <div className="hidden md:flex gap-2 h-full">
                     {menuOptions.center.map((option, index) => (
-                        <a key={index} href={option.link} className="text-white">{option.name}</a>
+                        (option.auth === false || (option.auth === isAuthenticated && option.auth === true)) ?
+                            (<a key={index} href={option.link} className="text-white">{option.name}</a>) :
+                            (<></>)
                     ))}
                 </div>
-
-                {/* Search Bar */}
                 <form onSubmit={handleSearchSubmit} className="relative flex-grow flex justify-end h-full">
                     <input type="text" name="search" className="bg-gray-700 text-white p-2 rounded pr-10 w-full md:w-auto h-full" placeholder="Search..." />
                     <button type="submit" className="absolute right-0 top-0 mt-3 mr-3 text-gray-400">
@@ -65,10 +65,10 @@ const NavBar = ({ user }) => {
 
             {/* User profile menu for md and larger screens */}
             {isAuthenticated && (
-                <div className="hidden md:block relative inline-block text-left h-full">
+                <div className="hidden md:block relative inline-block text-left h-full pt-2">
                     <div>
                         <button type="button" onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} className="focus:outline-none h-full" id="options-menu" aria-haspopup="true" aria-expanded="true">
-                            <img src={user.hasOwnProperty('picture') ? user.picture : "https://github.com/shadcn.png"} alt={user.name} className="h-10 w-10 rounded-full hover:shadow-outline focus:shadow-outline border border-transparent hover:border-blue-500 focus:border-blue-500" />
+                            <img src={user.hasOwnProperty('picture') ? user.picture : "https://github.com/shadcn.png"} alt={user.name} className="h-10 w-10 rounded-full hover:shadow-outline focus:shadow-outline border border-transparent hover:border-blue-500 focus:border-blue-500" referrerPolicy="no-referrer" />
                         </button>
                     </div>
                     {isProfileMenuOpen && (
