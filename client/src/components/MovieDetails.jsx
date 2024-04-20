@@ -158,7 +158,7 @@ const MovieDetails = ({ movieId }) => {
               <div className=''>
                 <img src={`https://image.tmdb.org/t/p/w500${movieJSON.poster_path}`} alt={movieJSON.original_title} className='w-72 h-90' />
               </div>
-              <div className='pt-10'>
+              <div className='pt-10 lg:min-w-[56rem]'>
                 <div className='flex flex-row'>
                   <h1 className='text-4xl font-bold text-gray-200' aria-label="movieTitle">{(movieJSON.original_title ).substring(0, 100)}</h1>
                   <h2 className='text-4xl ml-2 text-gray-200'>({(movieJSON.release_date || 'Unknown') === '999999' ? 'Unknown' : (movieJSON.release_date || 'Unknown').split('-')[0]})</h2>
