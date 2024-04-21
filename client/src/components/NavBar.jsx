@@ -21,6 +21,7 @@ const NavBar = ({ user, toast}) => {
         event.preventDefault();
         const query = event.target.elements.search.value.trim();
         if (query) {
+            event.target.elements.search.value = '';
             navigate(`/search/${query}`)
         } else {
             toast.error('Please enter a search query', toastProps);

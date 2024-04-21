@@ -7,11 +7,9 @@ import ReviewCard from './ReviewCard';
 import { Tabs } from "flowbite-react";
 import { fetchReviews, fetchRecommendations, fetchWatchlist, fetchMovieDetails, toastProps } from './Utils/utils';
 import { useAuth0 } from '@auth0/auth0-react';
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 
-const MovieDetails = ({ movieId }) => {
+const MovieDetails = ({ movieId, toast }) => {
 
   const [movieJSON, setMovieDetails] = useState(null);
   const { accessToken } = useAuthToken() || {};
@@ -128,7 +126,7 @@ const MovieDetails = ({ movieId }) => {
 
   useEffect(() => {
     if (accessToken) {
-      fetchWatchlist(accessToken, setWatchlist,toast);
+      fetchWatchlist(accessToken, setWatchlist, toast);
     }
   }, [accessToken]);
 
@@ -140,7 +138,7 @@ const MovieDetails = ({ movieId }) => {
 
 
   if (movieJSON === null || movieJSON.original_title === undefined || isLoading) {
-    return(
+    return (
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900" aria-label="loadingSpinner">
         </div>
@@ -150,7 +148,6 @@ const MovieDetails = ({ movieId }) => {
 
   return (
     <>
-      <ToastContainer />
       <div className="flex flex-col w-full">
         <div className='flex flex-row w-full'>
           <div className='relative w-full bg-no-repeat bg-cover ' style={{ backgroundImage: `linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url(https://image.tmdb.org/t/p/w500${movieJSON.poster_path || ''})` }}>
@@ -160,7 +157,7 @@ const MovieDetails = ({ movieId }) => {
               </div>
               <div className='pt-10 lg:min-w-[56rem]'>
                 <div className='flex flex-row'>
-                  <h1 className='text-4xl font-bold text-gray-200' aria-label="movieTitle">{(movieJSON.original_title ).substring(0, 100)}</h1>
+                  <h1 className='text-4xl font-bold text-gray-200' aria-label="movieTitle">{(movieJSON.original_title).substring(0, 100)}</h1>
                   <h2 className='text-4xl ml-2 text-gray-200'>({(movieJSON.release_date || 'Unknown') === '999999' ? 'Unknown' : (movieJSON.release_date || 'Unknown').split('-')[0]})</h2>
                 </div>
                 <div className='flex flex-row flex-wrap'>
@@ -172,7 +169,7 @@ const MovieDetails = ({ movieId }) => {
                 </div>
                 <div className='flex flex-row mt-5 items-center'>
                   <div className='relative w-14 h-14'>
-                   <div className={`rounded-md w-14 h-14 flex items-center justify-center ${Math.round((movieJSON.vote_average || 0) * 10) > 80 ? 'bg-green-500' : Math.round((movieJSON.vote_average || 0) * 10) > 60 ? 'bg-yellow-500' : Math.round((movieJSON.vote_average || 0) * 10) > 40 ? 'bg-orange-500' : 'bg-red-500'}`}>
+                    <div className={`rounded-md w-14 h-14 flex items-center justify-center ${Math.round((movieJSON.vote_average || 0) * 10) > 80 ? 'bg-green-500' : Math.round((movieJSON.vote_average || 0) * 10) > 60 ? 'bg-yellow-500' : Math.round((movieJSON.vote_average || 0) * 10) > 40 ? 'bg-orange-500' : 'bg-red-500'}`}>
                       <span className='text-lg font-bold text-white'>{Math.round((movieJSON.vote_average || 0) * 10)}%</span>
                     </div>
                   </div>
@@ -225,9 +222,9 @@ const MovieDetails = ({ movieId }) => {
                   <ReviewModal
                     isOpen={isOpened}
                     onClose={() => setIsOpened(false)}
-                    onAddReview={(reviewData) => handleAddReview(reviewData)} 
+                    onAddReview={(reviewData) => handleAddReview(reviewData)}
                     toast={toast}
-                    />
+                  />
                 </div>
               </Tabs.Item>
               <Tabs.Item active={isRecommendationTabOpen} title={<span className='text-xl font-bold'>Recommendations</span>} className='w-full'>

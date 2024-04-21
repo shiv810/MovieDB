@@ -4,6 +4,7 @@ import "@testing-library/jest-dom/extend-expect";
 import { useAuth0 } from "@auth0/auth0-react";
 import MovieDetails from "../components/MovieDetails";
 import { useAuthToken } from "../AuthTokenContext";
+import { toastProps } from "../components/Utils/utils";
 
 jest.mock("@auth0/auth0-react", () => ({
   useAuth0: jest.fn(() => ({
@@ -19,15 +20,24 @@ jest.mock("react-router-dom", () => ({
 
 
 describe("MovieDetails component: Without Auth", () => {
-  // Test: Kung Fu Panda 4 is the title.
+
+  const toast = {
+    error: jest.fn(),
+    success: jest.fn(),
+  }
+
   beforeEach(() => {
+    toast.error.mockClear();
+    toast.success.mockClear();
     useAuthToken.mockReturnValue({
       accessToken: "",
     })
   });
+
+  // Test: Kung Fu Panda 4 is the title.
   test("Title: renders movie title correctly", async () => {
     const movieId = 1011985;
-    render(<MovieDetails movieId={movieId} />);
+    render(<MovieDetails movieId={movieId} toast={toast} />);
     expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
@@ -41,7 +51,7 @@ describe("MovieDetails component: Without Auth", () => {
   // Test: Kung Fu Panda 4 is a movie from the United States and overview.
   test("Overview: renders movie overview correctly", async () => {
     const movieId = 1011985;
-    render(<MovieDetails movieId={movieId} />);
+    render(<MovieDetails movieId={movieId} toast={toast} />);
     expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
@@ -59,7 +69,7 @@ describe("MovieDetails component: Without Auth", () => {
   // Test: Release Date for Kung Fu Panda 4 is March 2, 2024
   test("Release Date: renders movie release data correctly", async () => {
     const movieId = 1011985;
-    render(<MovieDetails movieId={movieId} />);
+    render(<MovieDetails movieId={movieId} toast={toast} />);
     expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
@@ -77,7 +87,7 @@ describe("MovieDetails component: Without Auth", () => {
   // Test: Runtime for Kung Fu Panda 4 is 94 minutes or 1hr 34min
   test("Runtime: renders movie runtime correctly", async () => {
     const movieId = 1011985;
-    render(<MovieDetails movieId={movieId} />);
+    render(<MovieDetails movieId={movieId} toast={toast} />);
     expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
@@ -92,10 +102,10 @@ describe("MovieDetails component: Without Auth", () => {
     expect(runtime).toHaveTextContent("1hr 34min");
   });
 
-  // Test: Click Add to Watchlist button Expect a Toast to show "Please log in to add to watchlist"
+  // Test: Click Add to Watchlist button Expect a Toast to show "You must be logged in to add a movie to the watchlist"
   test("Add to Watchlist button: does the button works as expected", async () => {
     const movieId = 1011985;
-    render(<MovieDetails movieId={movieId} />);
+    render(<MovieDetails movieId={movieId} toast={toast} />);
     expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
@@ -109,15 +119,15 @@ describe("MovieDetails component: Without Auth", () => {
     //Click Add to Watchlist button
     fireEvent.click(addToWatchlistButton);
 
-    //Get Snackbar
-    const snackbar = screen.getByRole('alert');
-    expect(snackbar).toHaveTextContent("You must be logged in to add a movie to the watchlist");
+    //Check the toast.error is called with the expected message, correct toastProps and the correct number of times
+    expect(toast.error).toHaveBeenCalledWith("You must be logged in to add a movie to the watchlist", toastProps);
+    expect(toast.error).toHaveBeenCalledTimes(1);
   });
 
-  // Test: Click Add Review button Expect a Toast to show "Please log in to add a review"
+  // Test: Click Add Review button Expect a Toast to show "You must be logged in to add a review"
   test("Add Review Button: does the button work as expected", async () => {
     const movieId = 1011985;
-    render(<MovieDetails movieId={movieId} />);
+    render(<MovieDetails movieId={movieId} toast={toast} />);
     expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
@@ -131,9 +141,9 @@ describe("MovieDetails component: Without Auth", () => {
     //Click Add Review button
     fireEvent.click(addReviewButton);
 
-    //Get Snackbar
-    const snackbar = screen.getByRole('alert');
-    expect(snackbar).toHaveTextContent("You must be logged in to add a review");
+    //Check the toast.error is called with the expected message, correct toastProps and the correct number of times
+    expect(toast.error).toHaveBeenCalledWith("You must be logged in to add a review", toastProps);
+    expect(toast.error).toHaveBeenCalledTimes(1);
   });
 
 
@@ -141,7 +151,14 @@ describe("MovieDetails component: Without Auth", () => {
 
 
 describe("MovieDetails component: With Auth", () => {
+  const toast = {
+    error: jest.fn(),
+    success: jest.fn(),
+  }
+
   beforeEach(() => {
+    toast.error.mockClear();
+    toast.success.mockClear();
     useAuth0.mockReturnValue({
       isAuthenticated: true,
       isLoading: false,
@@ -230,7 +247,7 @@ describe("MovieDetails component: With Auth", () => {
   // Test: Renders with auth without crashing
   test("Renders with auth without crashing", async () => {
     const movieId = 1011985;
-    render(<MovieDetails movieId={movieId} />);
+    render(<MovieDetails movieId={movieId} toast={toast} />);
     expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
@@ -245,7 +262,7 @@ describe("MovieDetails component: With Auth", () => {
   //Test: Add to Watchlist button: Adds the movie to watchlist and shows a toast and the button changes to Remove from Watchlist
   test("Add to Watchlist button: Adds the movie to watchlist and shows a toast and the button changes to Remove from Watchlist", async () => {
     const movieId = 1011985;
-    render(<MovieDetails movieId={movieId} />);
+    render(<MovieDetails movieId={movieId} toast={toast} />);
     expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
@@ -264,9 +281,9 @@ describe("MovieDetails component: With Auth", () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     });
 
-    //Get Snackbar
-    const snackbar = screen.getByRole('alert');
-    expect(snackbar).toHaveTextContent("Movie added to watchlist");
+    //Check if toast.success is called with the expected message and the correct number of times
+    expect(toast.success).toHaveBeenCalledWith("Movie added to watchlist", toastProps);
+    expect(toast.success).toHaveBeenCalledTimes(1);
 
     //Get Remove from Watchlist button
     const removeFromWatchlistButton = screen.getByLabelText('removeFromWatchlistButton');
@@ -276,7 +293,7 @@ describe("MovieDetails component: With Auth", () => {
   //Test: Remove from Watchlist button: First adds the movie to watchlist and then removes it from the watchlist and shows a toast and the button changes to Add to Watchlist
   test("Remove from Watchlist button: First adds the movie to watchlist and then removes it from the watchlist and shows a toast and the button changes to Add to Watchlist", async () => {
     const movieId = 1011985;
-    render(<MovieDetails movieId={movieId} />);
+    render(<MovieDetails movieId={movieId} toast={toast} />);
     expect(screen.getByLabelText('loadingSpinner')).toBeInTheDocument();
 
     await act(async () => {
@@ -295,9 +312,9 @@ describe("MovieDetails component: With Auth", () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     });
 
-    //Get Snackbar
-    const snackbar = screen.getByRole('alert');
-    expect(snackbar).toHaveTextContent("Movie added to watchlist");
+    //Check if toast.success is called with the expected message and the correct number of times
+    expect(toast.success).toHaveBeenCalledWith("Movie added to watchlist", toastProps);
+    expect(toast.success).toHaveBeenCalledTimes(1);
 
     //Get Remove from Watchlist button
     const removeFromWatchlistButton = screen.getByLabelText('removeFromWatchlistButton');
@@ -311,11 +328,9 @@ describe("MovieDetails component: With Auth", () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
     });
 
-    //Get Snackbar
-    const snackbars = screen.getAllByRole('alert');
-    
-    //Since multiple toasts check all the possible toasts
-    expect(snackbars[1]).toHaveTextContent("Movie removed from watchlist");
+    //Check if toast.success is called with the expected message and the correct number of times
+    expect(toast.success).toHaveBeenCalledWith("Movie removed from watchlist", toastProps);
+    expect(toast.success).toHaveBeenCalledTimes(2);
 
     //Get Add to Watchlist button
     const addToWatchlistButton2 = screen.getByLabelText('addToWatchlistButton');
