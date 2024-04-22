@@ -138,7 +138,7 @@ app.get("/reviews/:movieId", async (req, res) => {
           time: review.createdAt,
           stars: review.stars,
           content: review.review,
-          user: user.email,
+          user: user.name,
         };
       })
     );
