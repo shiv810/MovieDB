@@ -44,7 +44,7 @@ You can recommend movies to other users and also see the recommendations given b
 ## Hosting
  
  - The website has been hosted on Vercel and can be accessed [here](https://themoviedb-lake.vercel.app//).
- - The backend has been hosted on Heroku and can be accessed [here](https://assignment-03-shivaditya.onrender.com/).
+ - The backend has been hosted on Render and can be accessed [here](https://assignment-03-shivaditya.onrender.com/).
 
 ## API Endpoints
 
