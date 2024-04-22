@@ -26,6 +26,9 @@ const fetchWatchlist = async (accessToken, setWatchlist, toast) => {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+    if (!response.ok) {
+      throw new Error(`${response.status}`);
+    }
     const data = await response.json();
     setWatchlist(data);
   } catch (error) {
@@ -45,6 +48,9 @@ const fetchWatchlist = async (accessToken, setWatchlist, toast) => {
           'Cache-Control': 'no-cache',
         },
       });
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
       const data = await response.json();
       setRecommendations(data);
     } catch (error) {
@@ -59,6 +65,9 @@ const fetchWatchlist = async (accessToken, setWatchlist, toast) => {
   const fetchMovieDetails = async (movieId, setMovieDetails, toast) => {
     try {
       const response = await fetch(`https://api.themoviedb.org/3/movie/${movieId}?api_key=034e14c6f2ab0e0ccfeea2a32339ffe3`);
+      if (!response.ok) {
+        throw new Error(`${response.status}`);
+      }
       const data = await response.json();
       data.movieId = data.movieId || movieId;
       setMovieDetails(data);
@@ -68,7 +77,6 @@ const fetchWatchlist = async (accessToken, setWatchlist, toast) => {
       } else {
         alert('Error fetching movie details: ' + error);
       }
-
     }
   };
 
