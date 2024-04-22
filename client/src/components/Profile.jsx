@@ -244,7 +244,7 @@ const Profile = () => {
                         </div>
                     </div>
                     <div className="mt-16 flex flex-col items-center">
-                        <h4 className="text-bluePrimary text-xl font-bold">{user.hasOwnProperty("name") ? user.name : user.email}</h4>
+                        <h4 className="text-bluePrimary text-xl font-bold">{userDetails.hasOwnProperty("name") ? userDetails.name : userDetails.email}</h4>
                     </div>
                     <div className="mt-6 w-full items-center">
                         <div className="w-full flex justify-center">
@@ -316,7 +316,7 @@ const Profile = () => {
                                     <div className='flex flex-col gap-10'>
                                         {reviews.length > 0 ? (
                                             reviews.map((review, index) => (
-                                                <ReviewCard key={index} id={review.id} user={user.hasOwnProperty("name") ? user.name : user.email} time={review.createdAt} stars={review.stars} content={review.review} movieId={review.movieId} picture={user.picture ? user.picture : ""} onUpdate={(reviewUpdated) => { handleReviewUpdate(reviewUpdated) }} onDelete={(review) => handleReviewDelete(review)} />
+                                                <ReviewCard key={index} id={review.id} user={userDetails.hasOwnProperty("name") ? userDetails.name : userDetails.email} time={review.createdAt} stars={review.stars} content={review.review} movieId={review.movieId} picture={user.picture ? user.picture : ""} onUpdate={(reviewUpdated) => { handleReviewUpdate(reviewUpdated) }} onDelete={(review) => handleReviewDelete(review)} />
                                             ))
                                         ) : (
                                             <p className='p-2 text-xl font-bold'>No Reviews made yet</p>
