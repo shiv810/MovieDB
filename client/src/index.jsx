@@ -4,7 +4,14 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NotFound from "./components/NotFound";
 import Home from "./components/Home";
 import { Auth0Provider } from "@auth0/auth0-react";
+import VerifyUser from "./components/VerifyUser";
 import { AuthTokenProvider } from "./AuthTokenContext";
+import RecommendationPage from "./components/RecommendationPage";
+import './styles.css';
+import MoviePage from "./components/MoviePage";
+import Profile from "./components/Profile";
+import AuthDebugger from "./components/AuthDebugger";
+import SearchPage from "./components/SearchPage";
 
 const container = document.getElementById("root");
 const root = ReactDOMClient.createRoot(container);
@@ -26,6 +33,14 @@ root.render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/verify-user" element={<VerifyUser />} />
+            <Route path="/movies/:movieId" element={<MoviePage />} />
+            <Route path="/recommendations/:movieId" element={<RecommendationPage />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:userId" element={<Profile />} />
+            <Route path="/authDebugger" element={<AuthDebugger />} />
+            <Route path="/search" element={<SearchPage/>} />
+            <Route path="/search/:query" element={<SearchPage/>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
